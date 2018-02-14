@@ -80,7 +80,7 @@ class Pageshoro(tk.Frame):
     def quit(self):
         self.controller.destroy()
     def Logout(self):
-        pass
+        request = session.post('http://127.0.0.1:5000/Logout')
         
 
 #play page
@@ -131,6 +131,10 @@ class Twoplayer(tk.Frame):
         button3 = tk.Button(self, text="Back",bg='black',fg='white',width=10,
                            command=lambda: controller.show_frame("Play"))
         button3.pack(side="bottom")
+
+
+       
+
     def movement():
         pass
 
@@ -150,17 +154,17 @@ class Fourplayer(tk.Frame):
         self.walls = [[""]*9]*8
         for i in range(1, 10):
             for j in range(1, 10):
-                self.buttons[i - 1][j - 1] = tk.Button(self, bg="blue")
+                self.buttons[i - 1][j - 1] = tk.Button(self, bg="lightgreen")
                 self.buttons[i - 1][j - 1].place(relx=i * 0.09, rely=j * 0.09, height=40, width=40)
 
         for i in range(1, 10):
             for j in range(1, 9):
-                self.lines[i-1][j-1] = tk.Button(self, bg="yellow")
+                self.lines[i-1][j-1] = tk.Button(self, bg="lightyellow")
                 self.lines[i - 1][j - 1].place(relx=i * 0.09, rely=(j+0.75) * 0.09, height=10, width=40)
 
         for i in range(1, 9):
             for j in range(1, 10):
-                self.walls[i-1][j-1] = tk.Button(self, bg="green")
+                self.walls[i-1][j-1] = tk.Button(self, bg="grey")
                 self.walls[i - 1][j - 1].place(relx=(i+0.75) * 0.09, rely=j * 0.09, height=40, width=10)
                 
         button3 = tk.Button(self, text="Back",bg='black',fg='white',width=10,
@@ -221,8 +225,12 @@ class PageRegister(tk.Frame):
         if(self.entUername.get()==""):
             self.khoroji.insert(END, "Wrong!!!")
         else:
-            request = session.post('http://127.0.0.1:5000/PageRegister', data={'username': self.entUername.get(), 'password': self.entPassword.get()})
-            self.controller.show_frame("PageLogin")
+            self.khoroji.delete(0.0, END)
+            request = session.post('http://127.0.0.1:5000/Register', data={'username': self.entUername.get(), 'password': self.entPassword.get()})
+            if(request.text == "successful"):
+                self.controller.show_frame("PageLogin")
+            else:
+                self.khoroji.insert(END, request.text)
         
 #loginpage        
 class PageLogin(tk.Frame):
@@ -234,21 +242,36 @@ class PageLogin(tk.Frame):
         label.pack(side="top", fill="x", pady=10)
         Label3=tk.Label(self, text="Username:", bg="black", fg="white", font="none 10 bold" )
         Label3.pack()
-        entrySpace=Entry(self)
-        entrySpace.pack()
+        self.entN=Entry(self)
+        self.entN.pack()
         Label4=tk.Label(self, text="Password:", bg="black", fg="white", font="none 10 bold" )
         Label4.pack()        
-        entrySpace=Entry(self)
-        entrySpace.pack()
+        self.entP=Entry(self)
+        self.entP.pack()
         button = tk.Button(self, text="Get Login", bg="black", fg="green",
-                           command=lambda: controller.show_frame("Pageshoro"))
+                           command= self.server5)
         button3 = tk.Button(self, text="Back",bg='black',fg='white',width=23,
                            command=lambda: controller.show_frame("Pageshoro"))
+        Label2 = tk.Label(self, text="",bg="black")
+        Label2.pack()
+        self.khoroji= Text(self,width=55,height=1,wrap=WORD,background="gray")
+        self.khoroji.pack()
+        
         button.pack()
         button3.pack()
 
-        def server5():
-            request = session.post('http://127.0.0.1:5000/Login', data={'username': username, 'password': password})
+    def server5(self):
+        self.khoroji.delete(0.0, END)
+        if(self.entN.get()==""):
+            self.khoroji.insert(END, "Wrong!!!")
+        if(self.entP.get()==""):
+            self.khoroji.insert(END, "Wrong!!!")
+        else:
+            request = session.post('http://127.0.0.1:5000/Login', data={'username': self.entN.get(), 'password': self.entP.get()})
+            if(request.text == "successful"):
+                self.controller.show_frame("Play")
+            else:
+                self.khoroji.insert(END, request.text)
 #page Rank
 class Rank(tk.Frame):
 
